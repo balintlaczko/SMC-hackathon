@@ -17,7 +17,7 @@ export default {
       connected: false,
       socket: null,
       // address: "ws://localhost:3000",
-      address: "wss://smc-hackathon-production.up.railway.app:3000"
+      address: "wss://smc-hackathon-production.up.railway.app"
     }
   },
   methods:
