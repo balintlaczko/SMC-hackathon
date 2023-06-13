@@ -12,5 +12,8 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "nodemon server/index.js"
+  },
+  "devDependencies": {
+    "@flydotio/dockerfile": "^0.2.15"
   }
 }

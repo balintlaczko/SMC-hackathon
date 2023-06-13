@@ -52,4 +52,14 @@ io.on("connection", (socket) => {
     socket.on("message", (message) => {
       console.log(message);
     });
+
+    socket.on("orientation", (orientation) => {
+        console.log("Got orientation");
+        scSocket.emit("orientation", [socket.id, orientation]);
+    });
+
+    socket.on("motion", (motion) => {
+        console.log("Got motion");
+        scSocket.emit("motion", [socket.id, motion]);
+    });
 });

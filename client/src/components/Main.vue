@@ -5,10 +5,15 @@
   <button @click="sayHi" >
     Say hi!
   </button>
+  <button :class="{ active: is_running }" @click="enableSensors" >
+    Sensors
+  </button>
 </template>
 
 <script>
 import io from "socket.io-client";
+
+// let motion;
 
 export default {
   name: 'MainComponent',
@@ -17,7 +22,14 @@ export default {
       connected: false,
       socket: null,
       // address: "ws://localhost:3000",
-      address: "wss://smc-hackathon-production.up.railway.app"
+      // address: "ws://10.10.40.117:3000",
+      address: "wss://smc.fly.dev",
+      is_running: false,
+    }
+  },
+  computed: {
+    socketStatus() {
+      return this.connected ? "Connected" : "Disconnected";
     }
   },
   methods:
@@ -40,6 +52,50 @@ export default {
     sayHi()
     {
       this.socket.emit("sayhi", "Hi!");
+    },
+    enableSensors(e) {
+      e.preventDefault();
+      // Request permission for iOS 13+ devices
+      // if (DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") {
+      //   DeviceMotionEvent.requestPermission();
+      // }
+      if (this.is_running) {
+        window.removeEventListener("deviceorientation", this.handleOrientation);
+        window.removeEventListener("devicemotion", this.handleMotion);
+        this.is_running = false;
+      } else {
+        window.addEventListener("deviceorientation", this.handleOrientation);
+        window.addEventListener("devicemotion", this.handleMotion);
+        this.is_running = true;
+      }
+    },
+    handleOrientation(event) {
+      const sensorOrientationData = {
+        alpha: event.alpha,
+        beta: event.beta,
+        gamma: event.gamma
+      };
+      this.socket.emit("orientation", sensorOrientationData);
+    },
+    handleMotion(event) {
+      const sensorMotionData = {
+        acceleration: {
+          x: event.acceleration.x,
+          y: event.acceleration.y,
+          z: event.acceleration.z
+        },
+        accelerationIncludingGravity: {
+          x: event.accelerationIncludingGravity.x,
+          y: event.accelerationIncludingGravity.y,
+          z: event.accelerationIncludingGravity.z
+        },
+        rotationRate: {
+          alpha: event.rotationRate.alpha,
+          beta: event.rotationRate.beta,
+          gamma: event.rotationRate.gamma
+        }
+      };
+      this.socket.emit("motion", sensorMotionData);
     }
   }
 }
@@ -60,5 +116,8 @@ li {
 }
 a {
   color: #42b983;
+}
+.active {
+  background-color: yellow;
 }
 </style>
