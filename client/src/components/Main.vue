@@ -15,14 +15,16 @@ export default {
   data () {
     return {
       connected: false,
-      socket: null
+      socket: null,
+      // address: "ws://localhost:3000",
+      address: "wss://smc-hackathon-production.up.railway.app:3000"
     }
   },
   methods:
   {
     connectSocket()
     {
-      this.socket = io('ws://localhost:3000');
+      this.socket = io(this.address);
       
       this.socket.on("connected", (connected) => {
           this.connected = connected;
