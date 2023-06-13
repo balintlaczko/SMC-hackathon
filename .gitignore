@@ -1,4 +1,5 @@
 .DS_Store
 node_modules
 max/node_modules
+osc/node_modules
 .vscode

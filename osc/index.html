@@ -1,0 +1,19 @@
+<button id="send">Send Message</button>
+<script type="text/javascript" src="osc.min.js"></script>
+<script type="text/javascript">
+  var osc = new OSC();
+  osc.open();
+
+  document.getElementById('send').addEventListener('click', () => {
+    // Rotate, tilt and tumble are radians
+    // var rotate = parseInt(Math.random() * 360);
+    // var tilt = parseInt(Math.random() * 360);
+    // var tumble = parseInt(Math.random() * 360);
+    var rotate = parseInt(Math.random() * 70 + 30);
+    var tilt = Math.random();
+    var tumble = Math.random();
+
+    var message = new OSC.Message('/gyro', rotate, tilt, tumble);
+    osc.send(message);
+  });
+</script>
