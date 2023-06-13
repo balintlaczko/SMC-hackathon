@@ -62,4 +62,9 @@ io.on("connection", (socket) => {
         console.log("Got motion");
         scSocket.emit("motion", [socket.id, motion]);
     });
+
+    socket.on("sensors", (sensors) => {
+        console.log("Got sensors");
+        scSocket.emit("sensors", [socket.id, sensors]);
+    });
 });

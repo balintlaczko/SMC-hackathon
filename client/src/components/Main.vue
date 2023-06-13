@@ -13,7 +13,30 @@
 <script>
 import io from "socket.io-client";
 
-// let motion;
+let sensorData = {
+        orientation: {
+          alpha: 0,
+          beta: 0,
+          gamma: 0
+        },
+        motion: {
+          acceleration: {
+            x: 0,
+            y: 0,
+            z: 0
+          },
+          accelerationIncludingGravity: {
+            x: 0,
+            y: 0,
+            z: 0
+          },
+          rotationRate: {
+            alpha: 0,
+            beta: 0,
+            gamma: 0
+          }
+        },
+      };
 
 export default {
   name: 'MainComponent',
@@ -75,7 +98,8 @@ export default {
         beta: event.beta,
         gamma: event.gamma
       };
-      this.socket.emit("orientation", sensorOrientationData);
+      sensorData.orientation = sensorOrientationData;
+      // this.socket.emit("orientation", sensorOrientationData);
     },
     handleMotion(event) {
       const sensorMotionData = {
@@ -95,7 +119,8 @@ export default {
           gamma: event.rotationRate.gamma
         }
       };
-      this.socket.emit("motion", sensorMotionData);
+      sensorData.motion = sensorMotionData;
+      this.socket.emit("sensors", sensorData);
     }
   }
 }

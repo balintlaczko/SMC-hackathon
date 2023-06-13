@@ -52,4 +52,26 @@ socket.on("motion", (data) => {
     osc.send(message)
     console.log("Sent motion");
 });
+
+socket.on("sensors", (data) => {
+    console.log("Got sensors");
+    // unpack data
+    const socketid = data[0];
+    const sensors = data[1];
+    console.log(socketid);
+    console.log(sensors);
+    const orientation = sensors.orientation;
+    const motion = sensors.motion;
+    const acceleration = motion.acceleration;
+    const accelerationIncludingGravity = motion.accelerationIncludingGravity;
+    const rotationRate = motion.rotationRate;
+    const idMessage = new OSC.Message('/tosc/sensors/id', socketid);
+    const orientationMessage = new OSC.Message('/tosc/sensors/orientation', orientation.alpha, orientation.beta, orientation.gamma);
+    const accelerationMessage = new OSC.Message('/tosc/sensors/acceleration', acceleration.x, acceleration.y, acceleration.z);
+    const accelerationIncludingGravityMessage = new OSC.Message('/tosc/sensors/accelerationIncludingGravity', accelerationIncludingGravity.x, accelerationIncludingGravity.y, accelerationIncludingGravity.z);
+    const rotationRateMessage = new OSC.Message('/tosc/sensors/rotationRate', rotationRate.alpha, rotationRate.beta, rotationRate.gamma);
+    const bundle = new OSC.Bundle(idMessage, orientationMessage, accelerationMessage, accelerationIncludingGravityMessage, rotationRateMessage);
+    osc.send(bundle);
+    console.log("Sent sensors");
+});
   
