@@ -62,8 +62,8 @@ export default {
       connected: false,
       socket: null,
       // address: "ws://localhost:3000",
-      address: "ws://10.21.1.42:3000",
-      // address: "wss://smc.fly.dev",
+      // address: "ws://10.21.1.42:3000",
+      address: "wss://smc.fly.dev",
       sensorsActive: false,
     }
   },
