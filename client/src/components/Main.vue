@@ -119,12 +119,11 @@ export default {
     },
     handleOrientation(event) {
       const sensorOrientationData = {
-        alpha: event.alpha,
-        beta: event.beta,
-        gamma: event.gamma
+        alpha: event.alpha - orientationOffset.alpha,
+        beta: event.beta - orientationOffset.beta,
+        gamma: event.gamma - orientationOffset.gamma
       };
-      sensorData.orientation = sensorOrientationData - orientationOffset;
-      // this.socket.emit("orientation", sensorOrientationData);
+      sensorData.orientation = sensorOrientationData;
     },
     handleMotion(event) {
       const sensorMotionData = {
