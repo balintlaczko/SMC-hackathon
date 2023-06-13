@@ -3,7 +3,7 @@ const OSC = require('osc-js')
 
 let socket;
 let url = "ws://localhost:3000";
-url = "wss://smc.fly.dev"; // for production
+// url = "wss://smc.fly.dev"; // for production
 const osc = new OSC({
     plugin: new OSC.DatagramPlugin({ send: { port: 12345, host: 'localhost' } })
   });
@@ -54,12 +54,12 @@ socket.on("motion", (data) => {
 });
 
 socket.on("sensors", (data) => {
-    console.log("Got sensors");
+    // console.log("Got sensors");
     // unpack data
     const socketid = data[0];
     const sensors = data[1];
-    console.log(socketid);
-    console.log(sensors);
+    // console.log(socketid);
+    // console.log(sensors);
     const orientation = sensors.orientation;
     const motion = sensors.motion;
     const acceleration = motion.acceleration;
@@ -71,7 +71,8 @@ socket.on("sensors", (data) => {
     const accelerationIncludingGravityMessage = new OSC.Message('/tosc/sensors/accelerationIncludingGravity', accelerationIncludingGravity.x, accelerationIncludingGravity.y, accelerationIncludingGravity.z);
     const rotationRateMessage = new OSC.Message('/tosc/sensors/rotationRate', rotationRate.alpha, rotationRate.beta, rotationRate.gamma);
     const bundle = new OSC.Bundle(idMessage, orientationMessage, accelerationMessage, accelerationIncludingGravityMessage, rotationRateMessage);
+    bundle.pack();
     osc.send(bundle);
-    console.log("Sent sensors");
+    // console.log("Sent sensors");
 });
   

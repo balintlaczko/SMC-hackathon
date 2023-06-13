@@ -1,13 +1,24 @@
 <template>
-  <button @click="connectSocket" >
-    Connect!
-  </button>
-  <button @click="sayHi" >
-    Say hi!
-  </button>
-  <button :class="{ active: is_running }" @click="enableSensors" >
-    Sensors
-  </button>
+  <div id="connection-led" :style="ledColor"></div>
+  <div class="main-container">
+    <div class="title" v-if="!connected">
+      Welcome!
+    </div>
+    <div class="btn" v-if="!connected" @click="connectSocket" >
+        Connect
+      </div>
+    <div v-if="connected" class="button-container">
+      <div class="btn" @click="sayHi" >
+        Say hi!
+      </div>
+      <div class="btn" :class="{ active: sensorsActive }" @click="enableSensors" >
+        Sensors
+      </div>
+      <div class="btn" id="center-btn" @click="centerOrientation">
+        Center!
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -38,6 +49,12 @@ let sensorData = {
         },
       };
 
+  let orientationOffset = {
+    alpha: 0,
+    beta: 0,
+    gamma: 0
+  };
+
 export default {
   name: 'MainComponent',
   data () {
@@ -45,14 +62,19 @@ export default {
       connected: false,
       socket: null,
       // address: "ws://localhost:3000",
-      // address: "ws://10.10.40.117:3000",
-      address: "wss://smc.fly.dev",
-      is_running: false,
+      address: "ws://10.21.1.42:3000",
+      // address: "wss://smc.fly.dev",
+      sensorsActive: false,
     }
   },
   computed: {
     socketStatus() {
       return this.connected ? "Connected" : "Disconnected";
+    },
+    ledColor() {
+      return {
+        "background-color": this.connected ? "#00ff33" : "red"
+      }
     }
   },
   methods:
@@ -82,15 +104,18 @@ export default {
       // if (DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") {
       //   DeviceMotionEvent.requestPermission();
       // }
-      if (this.is_running) {
+      if (this.sensorsActive) {
         window.removeEventListener("deviceorientation", this.handleOrientation);
         window.removeEventListener("devicemotion", this.handleMotion);
-        this.is_running = false;
+        this.sensorsActive = false;
       } else {
         window.addEventListener("deviceorientation", this.handleOrientation);
         window.addEventListener("devicemotion", this.handleMotion);
-        this.is_running = true;
+        this.sensorsActive = true;
       }
+    },
+    centerOrientation() {
+      orientationOffset = sensorData.orientation;
     },
     handleOrientation(event) {
       const sensorOrientationData = {
@@ -98,7 +123,7 @@ export default {
         beta: event.beta,
         gamma: event.gamma
       };
-      sensorData.orientation = sensorOrientationData;
+      sensorData.orientation = sensorOrientationData - orientationOffset;
       // this.socket.emit("orientation", sensorOrientationData);
     },
     handleMotion(event) {
@@ -128,21 +153,49 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.main-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+#connection-led {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  /* background-color: red; */
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+.title {
+  font-size: 30px;
+  font-weight: bold;
+  padding-bottom: 200px;
 }
 .active {
   background-color: yellow;
+}
+.button-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 100%;
+}
+.btn {
+  width: 100px;
+  height: 40px;
+  /* background-color: #00ff33; */
+  border: solid;
+  border-color: black;
+  border-width: 2px;
+  border-radius: 10px;
+  margin: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
