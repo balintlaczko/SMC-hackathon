@@ -115,7 +115,7 @@ export default {
       }
     },
     centerOrientation() {
-      orientationOffset -= sensorData.orientation;
+      orientationOffset = sensorData.orientation;
     },
     handleOrientation(event) {
       const sensorOrientationData = {
