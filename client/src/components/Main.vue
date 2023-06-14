@@ -151,14 +151,14 @@ export default {
     },
     handleOrientation(event) {
       const sensorOrientationData = {
-        alpha: this.foldDegree(event.alpha * (this.azimuthFlip * -1)  - orientationOffset.alpha),
-        beta: this.foldDegree(event.beta * (this.elevationFlip * -1) - orientationOffset.beta),
-        gamma: this.foldDegree(event.gamma * (this.rollFlip * -1) - orientationOffset.gamma)
+        alpha: this.foldDegree(event.alpha * (this.azimuthFlip == 1 ? -1 : 1)  - orientationOffset.alpha),
+        beta: this.foldDegree(event.beta * (this.elevationFlip == 1 ? -1 : 1) - orientationOffset.beta),
+        gamma: this.foldDegree(event.gamma * (this.rollFlip == 1 ? -1 : 1) - orientationOffset.gamma)
       };
       bufferOrientation = {
-        alpha: event.alpha * (this.azimuthFlip * -1),
-        beta: event.beta * (this.elevationFlip * -1),
-        gamma: event.gamma * (this.rollFlip * -1)
+        alpha: event.alpha * (this.azimuthFlip == 1 ? -1 : 1),
+        beta: event.beta * (this.elevationFlip == 1 ? -1 : 1),
+        gamma: event.gamma * (this.rollFlip == 1 ? -1 : 1)
       };
       sensorData.orientation = sensorOrientationData;
     },
