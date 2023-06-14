@@ -139,12 +139,36 @@ export default {
     {
       this.socket.emit("sayhi", "Hi!");
     },
+    iOS() {
+      return [
+        'iPad Simulator',
+        'iPhone Simulator',
+        'iPod Simulator',
+        'iPad',
+        'iPhone',
+        'iPod'
+      ].includes(navigator.platform)
+      // iPad on iOS 13 detection
+      || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+    },
+    isAndroid() {
+        const ua = navigator.userAgent.toLowerCase() + navigator?.platform.toLowerCase();
+        const _isAndroid = ua.indexOf("android") > -1;
+        return _isAndroid;
+    },
     enableSensors(e) {
       e.preventDefault();
-      // Request permission for iOS 13+ devices
-      // if (DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") {
-      //   DeviceMotionEvent.requestPermission();
-      // }
+      // let isIOS = /iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      console.log("isIOS", this.iOS());
+      console.log("isAndroid", this.isAndroid());
+      // isIOS = typeof navigator.standalone === 'boolean';
+      if (this.iOS()) {
+        console.log("Requesting permission for iOS 13+ devices...");
+        // Request permission for iOS 13+ devices
+        if (DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") {
+          DeviceMotionEvent.requestPermission();
+        }
+      }
       if (this.sensorsActive) {
         window.removeEventListener("deviceorientation", this.handleOrientation);
         window.removeEventListener("devicemotion", this.handleMotion);
