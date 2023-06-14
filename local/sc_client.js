@@ -3,7 +3,7 @@ const OSC = require('osc-js')
 
 let socket;
 let url = "ws://localhost:3000";
-url = "wss://smc.fly.dev"; // for production
+// url = "wss://smc.fly.dev"; // for production
 const osc = new OSC({
     plugin: new OSC.DatagramPlugin({ send: { port: 12345, host: 'localhost' } })
   });

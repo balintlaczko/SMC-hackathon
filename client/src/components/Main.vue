@@ -14,6 +14,17 @@
       <div class="btn" :class="{ active: sensorsActive }" @click="enableSensors" >
         Sensors
       </div>
+      <div class="flip-container">
+        <div class="btn" id="flip-azimuth" :class="{ active: azimuthFlip }" @click="flipAzimuth">
+          Flip azimuth
+        </div>
+        <div class="btn" id="flip-elevation" :class="{ active: elevationFlip }" @click="flipElevation">
+          Flip elevation
+        </div>
+        <div class="btn" id="flip-roll" :class="{ active: rollFlip }" @click="flipRoll">
+          Flip roll
+        </div>
+      </div>
       <div class="btn" id="center-btn" @click="centerOrientation">
         Center!
       </div>
@@ -48,7 +59,12 @@ let sensorData = {
           }
         },
       };
-
+  // we capture the orientation data post-flips but before offset here
+  let bufferOrientation = {
+    alpha: 0,
+    beta: 0,
+    gamma: 0
+  };
   let orientationOffset = {
     alpha: 0,
     beta: 0,
@@ -62,9 +78,12 @@ export default {
       connected: false,
       socket: null,
       // address: "ws://localhost:3000",
-      // address: "ws://10.21.1.42:3000",
+      // address: "ws://10.10.40.101:3000",
       address: "wss://smc.fly.dev",
       sensorsActive: false,
+      azimuthFlip: 0,
+      elevationFlip: 0,
+      rollFlip: 0,
     }
   },
   computed: {
@@ -88,6 +107,19 @@ export default {
           if (this.connected) console.log("Connected to server.");
         });
 
+    },
+    flipAzimuth() {
+      this.azimuthFlip = 1 - this.azimuthFlip;
+    },
+    flipElevation() {
+      this.elevationFlip = 1 - this.elevationFlip;
+    },
+    flipRoll() {
+      this.rollFlip = 1 - this.rollFlip;
+    },
+    foldDegree(degree) {
+      let mod360 = degree % 360;
+      return (mod360 % 180) + (Math.floor(mod360 / 180) * -180);
     },
     disconnectSocket()
     {
@@ -115,13 +147,18 @@ export default {
       }
     },
     centerOrientation() {
-      orientationOffset = sensorData.orientation;
+      orientationOffset = bufferOrientation;
     },
     handleOrientation(event) {
       const sensorOrientationData = {
-        alpha: event.alpha - orientationOffset.alpha,
-        beta: event.beta - orientationOffset.beta,
-        gamma: event.gamma - orientationOffset.gamma
+        alpha: this.foldDegree(event.alpha * (this.azimuthFlip * -1)  - orientationOffset.alpha),
+        beta: this.foldDegree(event.beta * (this.elevationFlip * -1) - orientationOffset.beta),
+        gamma: this.foldDegree(event.gamma * (this.rollFlip * -1) - orientationOffset.gamma)
+      };
+      bufferOrientation = {
+        alpha: event.alpha * (this.azimuthFlip * -1),
+        beta: event.beta * (this.elevationFlip * -1),
+        gamma: event.gamma * (this.rollFlip * -1)
       };
       sensorData.orientation = sensorOrientationData;
     },
@@ -182,6 +219,13 @@ export default {
   justify-content: space-evenly;
   align-items: center;
   height: 100%;
+}
+.flip-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100%;
 }
 .btn {
   width: 100px;
