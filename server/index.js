@@ -29,6 +29,11 @@ const io = socketIO(server, {
 console.log("socket.io server created");
 
 let scSocket;
+const numClients = 30;
+let synthSlots = Array(numClients).fill(0);
+let synthSlots2clientSockets = {};
+let clientSockets2synthSlots = {};
+
 
 io.on("connection", (socket) => {
     console.log("Client connected with id: " + socket.id);
@@ -40,13 +45,36 @@ io.on("connection", (socket) => {
         socket.emit("serverpost", "Hello, SC!");
     });
 
+    socket.on("iamclient", () => {
+        console.log("Client is a phone.");
+        // find the first available synth slot
+        let synthSlot = synthSlots.findIndex((slot) => slot === 0);
+        if (synthSlot === -1) {
+          console.log("No synth slots available.");
+          socket.emit("serverpost", "No synth slots available.");
+        } else {
+          synthSlots[synthSlot] = 1;
+          clientSockets2synthSlots[socket.id] = synthSlot;
+          synthSlots2clientSockets[synthSlot] = socket.id;
+          console.log("Client assigned synth slot: " + synthSlot);
+          socket.emit("serverpost", "Assigned synth slot: " + synthSlot);
+        }
+    });
+
     socket.on("sayhi", () => {
         console.log("Client said hi.");
         scSocket.emit("serverpost", "Hi!");
     });
   
     socket.on("disconnect", () => {
-        console.log("Client disconnected.");
+      if (clientSockets2synthSlots[socket.id]) {
+        console.log("Client " + socket.id + " with synthSlot " + clientSockets2synthSlots[socket.id] + " disconnected.");
+        synthSlots[clientSockets2synthSlots[socket.id]] = 0;
+        delete synthSlots2clientSockets[clientSockets2synthSlots[socket.id]];
+        delete clientSockets2synthSlots[socket.id];
+      } else {
+        console.log("Client " + socket.id + " disconnected.");
+      }
     });
   
     socket.on("message", (message) => {
@@ -65,6 +93,7 @@ io.on("connection", (socket) => {
 
     socket.on("sensors", (sensors) => {
         console.log("Got sensors");
-        scSocket.emit("sensors", [socket.id, sensors]);
+        // scSocket.emit("sensors", [socket.id, sensors]);
+        scSocket.emit("sensors", [clientSockets2synthSlots[socket.id], sensors]);
     });
 });
