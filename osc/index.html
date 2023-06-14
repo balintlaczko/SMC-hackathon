@@ -1,19 +1,57 @@
-<button id="send">Send Message</button>
+<button id="fast">Fast heartbeat</button>
+<button id="medium">Medium heartbeat</button>
+<button id="slow">Slow heartbeat</button>
+
 <script type="text/javascript" src="osc.min.js"></script>
 <script type="text/javascript">
   var osc = new OSC();
   osc.open();
 
-  document.getElementById('send').addEventListener('click', () => {
+  document.getElementById('fast').addEventListener('click', () => {
+    var slot = 1;
+    var bpm = parseInt(Math.random() * 50 + 200);
+    // In radians
+    var phi = 2 * Math.PI * Math.random() - Math.PI;
+    var theta = 2 * Math.PI * Math.random() - Math.PI;
+    var message = new OSC.Message('/gyro', slot, bpm, phi, theta);
+
+    osc.send(message);
+  });
+  document.getElementById('medium').addEventListener('click', () => {
+    var slot = 2;
+    var bpm = parseInt(Math.random() * 50 + 100);
+    var phi = 2 * Math.PI * Math.random() - Math.PI;
+    var theta = 2 * Math.PI * Math.random() - Math.PI;
+    var message = new OSC.Message('/gyro', slot, bpm, phi, theta);
+
+    osc.send(message);
+  });
+  document.getElementById('slow').addEventListener('click', () => {
+    var slot = 3;
+    var bpm = parseInt(Math.random() * 50);
+    var phi = 2 * Math.PI * Math.random()
+    var theta = 2 * Math.PI * Math.random() - Math.PI;
+    var message = new OSC.Message('/gyro', slot, bpm, phi, theta);
+
+    osc.send(message);
+
+
+  });
+
+
+
+
     // Rotate, tilt and tumble are radians
     // var rotate = parseInt(Math.random() * 360);
     // var tilt = parseInt(Math.random() * 360);
     // var tumble = parseInt(Math.random() * 360);
-    var rotate = parseInt(Math.random() * 70 + 30);
-    var tilt = Math.random();
-    var tumble = Math.random();
+    
+    // var rotate = parseInt(Math.random() * 70 + 30);
+    // var tilt = Math.random();
+    // var tumble = Math.random();
 
-    var message = new OSC.Message('/gyro', rotate, tilt, tumble);
-    osc.send(message);
-  });
+    // var message = new OSC.Message('/gyro', rotate, tilt, tumble);
+
 </script>
+
+
