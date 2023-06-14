@@ -41,6 +41,10 @@ let sensorData = {
           beta: 0,
           gamma: 0
         },
+        orientationRadians: {
+          theta: 0,
+          phi: 0,
+        },
         motion: {
           acceleration: {
             x: 0,
@@ -105,6 +109,7 @@ export default {
       this.socket.on("connected", (connected) => {
           this.connected = connected;
           if (this.connected) console.log("Connected to server.");
+          this.socket.emit("iamclient");
         });
 
     },
@@ -118,8 +123,12 @@ export default {
       this.rollFlip = 1 - this.rollFlip;
     },
     foldDegree(degree) {
-      let mod360 = degree % 360;
-      return (mod360 % 180) + (Math.floor(mod360 / 180) * -180);
+      return degree;
+      // let mod360 = degree % 360;
+      // return (mod360 % 180) + (Math.floor(mod360 / 180) * -180);
+    },
+    degreesToRadians(degrees) {
+      return degrees * (Math.PI / 180);
     },
     disconnectSocket()
     {
@@ -151,16 +160,21 @@ export default {
     },
     handleOrientation(event) {
       const sensorOrientationData = {
-        alpha: this.foldDegree(event.alpha * (this.azimuthFlip == 1 ? -1 : 1)  - orientationOffset.alpha),
-        beta: this.foldDegree(event.beta * (this.elevationFlip == 1 ? -1 : 1) - orientationOffset.beta),
-        gamma: this.foldDegree(event.gamma * (this.rollFlip == 1 ? -1 : 1) - orientationOffset.gamma)
+        alpha: (event.alpha  - orientationOffset.alpha) * (this.azimuthFlip == 1 ? -1 : 1),
+        beta: (event.beta - orientationOffset.beta) * (this.elevationFlip == 1 ? -1 : 1),
+        gamma: (event.gamma - orientationOffset.gamma) * (this.rollFlip == 1 ? -1 : 1)
+      };
+      const sensorOrientationDataRadians = {
+        theta: this.degreesToRadians(sensorOrientationData.alpha),
+        phi: this.degreesToRadians(sensorOrientationData.beta)
       };
       bufferOrientation = {
-        alpha: event.alpha * (this.azimuthFlip == 1 ? -1 : 1),
-        beta: event.beta * (this.elevationFlip == 1 ? -1 : 1),
-        gamma: event.gamma * (this.rollFlip == 1 ? -1 : 1)
+        alpha: event.alpha,
+        beta: event.beta,
+        gamma: event.gamma
       };
       sensorData.orientation = sensorOrientationData;
+      sensorData.orientationRadians = sensorOrientationDataRadians;
     },
     handleMotion(event) {
       const sensorMotionData = {
